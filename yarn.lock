@@ -3046,6 +3046,11 @@ synckit@^0.8.5:
     "@pkgr/utils" "^2.3.1"
     tslib "^2.5.0"
 
+tabler-icons-react@^1.56.0:
+  version "1.56.0"
+  resolved "https://registry.yarnpkg.com/tabler-icons-react/-/tabler-icons-react-1.56.0.tgz#d2a6cf9160f25b370c38c356fa6284c254e5113e"
+  integrity sha512-FOme3w6PJIWDpeXqQ4xjArQqdxzrr9xNy7PSSgWpRzOUQ71RyZ7jt6WThsfyLBz5os78TPJRA8f/0NLjnKcx9A==
+
 tailwindcss@3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-3.3.2.tgz#2f9e35d715fdf0bbf674d90147a0684d7054a2d3"

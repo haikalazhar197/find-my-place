@@ -1,4 +1,9 @@
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  useJsApiLoader,
+  MarkerF,
+  InfoBoxF,
+} from "@react-google-maps/api";
 
 /*
   GOOGLE LIBRARIES
@@ -26,7 +31,7 @@ export const Map = () => {
 
   // GET THE LOCATION FROM THE STORE
   const { location } = useAppSelector((state) => ({
-    location: state.location.location,
+    location: state.location,
   }));
 
   // IF THE MAP IS NOT LOADED RETURN NULL AS THE CHILDREN
@@ -35,10 +40,12 @@ export const Map = () => {
   return (
     <GoogleMap
       mapContainerClassName="w-full aspect-[9/16] rounded-xl mt-10 md:aspect-[16/9]"
-      center={location}
+      center={location.location}
       zoom={15}
     >
-      {" "} 
+      {location.location.place_address && (
+        <MarkerF position={location.location} />
+      )}
     </GoogleMap>
   );
 };

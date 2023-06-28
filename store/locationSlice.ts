@@ -12,11 +12,15 @@ const latLangSchema = z.object({
 /*
   TYPES
 */
+interface Location {
+  lat: number;
+  lng: number;
+  place_address?: string;
+}
+
 interface LocationState {
-  location: {
-    lat: number;
-    lng: number;
-  };
+  location: Location;
+  history: Location[];
   pending: boolean;
   error: boolean;
 }
@@ -29,6 +33,7 @@ const initialState: LocationState = {
     lat: 3.101,
     lng: 101.584,
   },
+  history: [],
   pending: false,
   error: false,
 };
@@ -45,7 +50,9 @@ export const getLocation = createAsyncThunk(
     );
     const data = await res.json();
     const latlang = latLangSchema.parse(data?.location);
-    return latlang;
+    return {
+      location: { ...latlang, place_address: address },
+    };
   }
 );
 
@@ -63,7 +70,15 @@ export const locationSlice = createSlice({
     builder.addCase(getLocation.fulfilled, (state, action) => {
       state.pending = false;
       state.error = false;
-      state.location = action.payload;
+
+      const location = action.payload.location;
+      const history = state.history;
+      const isDuplicate = history.some(
+        (item) => item.place_address === location.place_address
+      );
+
+      state.location = action.payload.location;
+      state.history = isDuplicate ? history : [location, ...history];
     });
     builder.addCase(getLocation.rejected, (state) => {
       state.pending = false;
