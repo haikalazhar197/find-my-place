@@ -21,6 +21,7 @@ import {
   Autocomplete,
 } from "@react-google-maps/api";
 import { useRef, useState } from "react";
+import { AutocompletePlaces } from "@/components/AutocompletePlaces";
 
 /*
   COMPONENTS
@@ -29,7 +30,13 @@ import { useRef, useState } from "react";
 /*
   GOOGLE LIBRARIES
 */
-const LIBRARIES: ("places" | "geometry" | "drawing" | "localContext" | "visualization")[] = ["places"];
+const LIBRARIES: (
+  | "places"
+  | "geometry"
+  | "drawing"
+  | "localContext"
+  | "visualization"
+)[] = ["places"];
 
 const getLatLngFromAddress = async (address: string) => {
   const res = await fetch(
@@ -58,8 +65,6 @@ export default function Home() {
 
   const [latLng, setLatLng] = useState({ lat: 3.101, lng: 101.584 });
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const handleGetLatLng = async (address: string) => {
     try {
       const data = await getLatLngFromAddress(address || "Kuala Lumpur");
@@ -80,25 +85,14 @@ export default function Home() {
       <main
         className={`flex min-h-screen flex-col items-center justify-start py-24 px-10 md:px-24 ${inter.className}`}
       >
+        <AutocompletePlaces
+          onSelect={(value) => {
+            handleGetLatLng(value);
+          }}
+        />
+
         {isLoaded && (
           <>
-            <Autocomplete
-              onPlaceChanged={() => {
-                const place = inputRef.current?.value;
-                if (place) {
-                  handleGetLatLng(place);
-                }
-              }}
-              restrictions={{ country: "my" }}
-            >
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="Search"
-                className="border border-gray-400 rounded-md px-4 py-2"
-              />
-            </Autocomplete>
-
             <GoogleMap
               mapContainerClassName="w-full aspect-[9/16] rounded-xl mt-10 md:aspect-[16/9]"
               center={latLng}
