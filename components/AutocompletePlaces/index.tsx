@@ -7,6 +7,7 @@ import { AutoComplete, Button } from "antd";
 import { z } from "zod";
 import { useState } from "react";
 import { useDebouncedAsyncFn } from "@/lib/hooks/useDebouncedAsyncFn";
+import { useStore } from "@/store/store";
 
 const getPlaces = async (search: string) => {
   if (search.length === 0) return [];
@@ -18,11 +19,13 @@ const getPlaces = async (search: string) => {
 
     const places = z
       .object({
-        places: z.array(
-          z.object({
-            value: z.string(),
-          })
-        ).optional(),
+        places: z
+          .array(
+            z.object({
+              value: z.string(),
+            })
+          )
+          .optional(),
       })
       .parse(data);
 
@@ -33,10 +36,8 @@ const getPlaces = async (search: string) => {
   }
 };
 
-interface AutocompletePlacesProps {
-  onSelect?: (value: string) => void;
-}
-export const AutocompletePlaces = ({ onSelect }: AutocompletePlacesProps) => {
+interface AutocompletePlacesProps {}
+export const AutocompletePlaces = ({}: AutocompletePlacesProps) => {
   const [value, setValue] = useState("");
   const [options, setOptions] = useState<{ value: string }[]>([]);
 
@@ -49,13 +50,18 @@ export const AutocompletePlaces = ({ onSelect }: AutocompletePlacesProps) => {
     }
   );
 
+  const { getLocation } = useStore((state) => ({
+    getLocation: state.getLocation,
+  }));
+
   return (
     <div className="w-full flex items-center justify-center gap-3">
       <AutoComplete
         value={value}
         onChange={(value) => setValue(value)}
         onSelect={(value) => {
-          onSelect?.(value);
+          //   onSelect?.(value);
+          getLocation(value);
         }}
         options={options}
         style={{ width: 300 }}
@@ -64,7 +70,8 @@ export const AutocompletePlaces = ({ onSelect }: AutocompletePlacesProps) => {
       />
       <Button
         onClick={() => {
-          onSelect?.(value);
+          //   onSelect?.(value);
+          getLocation(value);
         }}
       >
         Search

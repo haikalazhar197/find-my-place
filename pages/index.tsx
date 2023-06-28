@@ -22,6 +22,7 @@ import {
 } from "@react-google-maps/api";
 import { useRef, useState } from "react";
 import { AutocompletePlaces } from "@/components/AutocompletePlaces";
+import { useStore } from "@/store/store";
 
 /*
   COMPONENTS
@@ -63,17 +64,7 @@ export default function Home() {
     libraries: LIBRARIES,
   });
 
-  const [latLng, setLatLng] = useState({ lat: 3.101, lng: 101.584 });
-
-  const handleGetLatLng = async (address: string) => {
-    try {
-      const data = await getLatLngFromAddress(address || "Kuala Lumpur");
-
-      setLatLng(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { location } = useStore((state) => ({ location: state.location }));
 
   return (
     <>
@@ -85,17 +76,13 @@ export default function Home() {
       <main
         className={`flex min-h-screen flex-col items-center justify-start py-24 px-10 md:px-24 ${inter.className}`}
       >
-        <AutocompletePlaces
-          onSelect={(value) => {
-            handleGetLatLng(value);
-          }}
-        />
+        <AutocompletePlaces />
 
         {isLoaded && (
           <>
             <GoogleMap
               mapContainerClassName="w-full aspect-[9/16] rounded-xl mt-10 md:aspect-[16/9]"
-              center={latLng}
+              center={location}
               zoom={15}
             >
               {" "}
