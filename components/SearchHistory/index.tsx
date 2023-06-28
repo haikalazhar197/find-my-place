@@ -50,7 +50,7 @@ export const SearchHistory = () => {
               }}
               className="py-4 px-4 rounded-md hover:bg-gray-50 text-left"
             >
-              <p>{item.place_address || "This is number 1"}</p>
+              <p>{item.place_address || "This is the address"}</p>
             </button>
           ))}
         </div>
