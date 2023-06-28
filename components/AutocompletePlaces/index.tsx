@@ -4,74 +4,69 @@
 import { AutoComplete, Button } from "antd";
 
 // TYPES
-import { z } from "zod";
 import { useState } from "react";
+
+/*
+    STORE
+*/
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { getLocation } from "@/store/locationSlice";
+import { getPlaces } from "@/store/placesSlice";
+
+/*
+  HOOKS
+*/
 import { useDebouncedAsyncFn } from "@/lib/hooks/useDebouncedAsyncFn";
-import { useStore } from "@/store/store";
-
-const getPlaces = async (search: string) => {
-  if (search.length === 0) return [];
-
-  try {
-    const data = await fetch(
-      `/api/get-places?search=${encodeURIComponent(search)}`
-    ).then((res) => res.json());
-
-    const places = z
-      .object({
-        places: z
-          .array(
-            z.object({
-              value: z.string(),
-            })
-          )
-          .optional(),
-      })
-      .parse(data);
-
-    return places.places;
-  } catch (error) {
-    console.log("Error getting places", error);
-    return [];
-  }
-};
 
 interface AutocompletePlacesProps {}
 export const AutocompletePlaces = ({}: AutocompletePlacesProps) => {
+  // USER INPUT
   const [value, setValue] = useState("");
-  const [options, setOptions] = useState<{ value: string }[]>([]);
 
+  // GET THE PLACES FROM THE STORE AS OPTIONS
+  const { options } = useAppSelector((state) => ({
+    options: state.places.places,
+  }));
+
+  // DISPATCH
+  const dispatch = useAppDispatch();
+
+  // DEBOUNCE THE USER INPUT TO LIMIT THE NUMBER OF REQUESTS
   const [_, loading, cancel] = useDebouncedAsyncFn(
     value,
-    500,
+    200,
     async (value) => {
-      const places = await getPlaces(value);
-      setOptions(places || []);
+      dispatch(getPlaces(value));
     }
   );
-
-  const { getLocation } = useStore((state) => ({
-    getLocation: state.getLocation,
-  }));
 
   return (
     <div className="w-full flex items-center justify-center gap-3">
       <AutoComplete
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            // IF ENTERED USE THE FIRST OPTION
+
+            setValue(options[0].value || "");
+            dispatch(getLocation(options[0].value || ""));
+          }
+        }}
         value={value}
         onChange={(value) => setValue(value)}
         onSelect={(value) => {
-          //   onSelect?.(value);
-          getLocation(value);
+          dispatch(getLocation(value));
         }}
         options={options}
-        style={{ width: 300 }}
+        style={{ width: 500 }}
         placeholder="input here"
         allowClear
       />
       <Button
         onClick={() => {
-          //   onSelect?.(value);
-          getLocation(value);
+          // IF CLICKED USE THE FIRST OPTION
+
+          setValue(options[0].value || "");
+          dispatch(getLocation(options[0].value || ""));
         }}
       >
         Search
